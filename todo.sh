@@ -8,47 +8,61 @@
 # -f : finish task , and move it to deletedtasks
 # -e : edit tasks
 # -n : the number of todotasks
+# -fa or -af : get all finished tasks
 # -nd or -dn : the number of deleted tasks
 # --hel
 
-function addtask() {
-  number_of_tasks=`wc -l todolist.txt`
-  current_number=$(( $number_of_tasks + 1 ))
-  current_date=`date`
-  echo "$current_number $1 $current_date" >> todolist.txt
-  echo "Done"
+function addtask () {
+   current_number=$(( $number_of_tasks + 1 ))
+   current_date=`date`
+   echo "$1 ($current_date)" >> todolist.txt
+   echo "Done"
 }
 
 function getalltask () {
-  cat -n todolist.txt
+   cat -n todolist.txt
 }
 
 function finishtask () {
-    echo 1
+   sed -n "$1p" todolist.txt >> deletedtask.txt
+   sed -i "$1d" "todolist.txt"
 }
 
 function edittask () {
-    echo 1
+   line_to_replace=`sed -n "$1p" todolist.txt`
+   current_date=`date`
+
+   sed -i "s/$line_to_replace/$2 ($current_date)/" todolist.txt
+   echo "Done"
 }
 
-function numberOftasks () {
-    number_of_task=`cat -n todolist.txt`
-    echo $number_of_task
+function number_of_tasks () {
+   number_of_task=`wc -l < todolist.txt`
+   echo $number_of_task
 }
 
-function numberofdeletedtask () {
-    echo 1
+function number_of_deleted_tasks () {
+   deleted_tasks=`wc -l < deletedtask.txt`
+   echo $deleted_tasks
+}
+
+function get_by_umber () {
+   sed -n "$1p" todolist.txt
+}
+
+function get_finished_tasks() {
+   cat -n deletedtask.txt
 }
 
 function help_function () {
-    echo "todo.sh is tool to create, edit, delete a task in to do task"
-    echo "flags documentation"
-    echo "-a : print all tasks to finish"
-    echo "-t : add new task to todolist"
-    echo "-f : finish task , and move it to deletedtasks"
-    echo "-e : edit tasks"
-    echo "-n : the number of todotasks"
-    echo "-nd or -dn : the number of deleted tasks"
+   echo "todo.sh is tool to create, edit, delete a task in to do task"
+   echo "flags documentation"
+   echo "-a : print all tasks to finish"
+   echo "-t : add new task to todolist"
+   echo "-f : finish task , and move it to deletedtasks"
+   echo "-e : edit tasks"
+   echo "-n : the number of todotasks"
+   echo "-nd or -dn : the number of deleted tasks"
 }
 
 
@@ -60,22 +74,25 @@ then
    addtask $2
 elif [ $1 == "-f" ]
 then
-   echo $1
+   finishtask $2
 elif [ $1 == "-g" ]
 then
-   echo $1
+   get_by_number $2
 elif [ $1 == "-n" ]
 then
-   numberOftasks
+   number_of_tasks
 elif [ $1 == "-e" ]
 then
-   echo $1
+   edittask $2 $3
 elif [ $1 == "-nd" -o $1 == "-dn" ]
 then
-   echo $1
+   number_of_deleted_tasks
 elif [ $1 == "--help" -o $1 == "-h" ]
 then
    help_function
+elif [ $1 == "-af" -o $1 == "-fa"]
+then
+   get_finished_tasks
 else
    echo "please enter a valid flag or run the command with --help or -h to understand"
 fi
