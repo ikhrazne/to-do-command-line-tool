@@ -65,33 +65,50 @@ function help_function () {
    echo "-nd or -dn : the number of deleted tasks"
 }
 
+# error handling
+function error_handling() {
+   if [ $1 -gt $2]
+   then
+      echo "command error: to many parameters"
+      exit 1
+   fi
+}
+
 
 if [ $1 == "-a" ]
 then
+   error_handling $# 2
    getalltask
 elif [ $1 == "-t" ]
 then
+   error_handling $# 3
    addtask $2
 elif [ $1 == "-f" ]
 then
+   error_handling $# 3
    finishtask $2
 elif [ $1 == "-g" ]
 then
+   error_handling $# 3
    get_by_number $2
 elif [ $1 == "-n" ]
 then
+   error_handling $# 2
    number_of_tasks
 elif [ $1 == "-e" ]
 then
+   error_handling $# 4
    edittask $2 $3
 elif [ $1 == "-nd" -o $1 == "-dn" ]
 then
+   error_handling $# 2
    number_of_deleted_tasks
 elif [ $1 == "--help" -o $1 == "-h" ]
 then
    help_function
 elif [ $1 == "-af" -o $1 == "-fa"]
 then
+   error_handling $# 2
    get_finished_tasks
 else
    echo "please enter a valid flag or run the command with --help or -h to understand"
